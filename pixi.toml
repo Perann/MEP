@@ -1,0 +1,17 @@
+[workspace]
+authors = ["nedjar.prn@gmail.com <nedjar.prn@gmail.com>"]
+channels = ["conda-forge"]
+name = "MEP"
+platforms = ["linux-64", "osx-arm64",]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = "3.10.*"
+numpy = ">=2.2.6,<3"
+pandas = ">=2.3.3,<3"
+scikit-learn = ">=1.7.2,<2"
+ipykernel = ">=7.2.0,<8"
+pre-commit = ">=4.5.1,<5"
+black = ">=26.3.1,<27"

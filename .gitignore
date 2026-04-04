@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.env# pixi environments
+.pixi/*
+!.pixi/config.toml
+.cache/pre-commit/
