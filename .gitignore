@@ -8,3 +8,5 @@ env/
 .pixi/*
 !.pixi/config.toml
 .cache/pre-commit/
+data/
+notebooks/mlruns
