@@ -10,3 +10,4 @@ env/
 .cache/pre-commit/
 data/
 notebooks/mlruns
+.env
