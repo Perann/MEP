@@ -25,8 +25,6 @@ from mlflow.models import infer_signature
 import warnings
 
 warnings.filterwarnings("ignore", message=".*Inferred schema contains integer column.*")
-# This is only to off the very long warning about integer columns that could
-# cause problems at inference time.
 
 
 SEED = 42
