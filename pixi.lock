@@ -254,7 +254,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/pandas-2.3.3-py310h0158d43_2.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/paramiko-4.0.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/parso-0.8.6-pyhcf101f3_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/linux-64/pathlib-1.0.1-py310hff52083_7.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/noarch/pathspec-1.0.4-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/pcre2-10.47-haa7fec5_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pexpect-4.9.0-pyhd8ed1ab_1.conda
@@ -600,7 +599,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/pandas-2.3.3-py310h25f4b65_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/paramiko-4.0.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/parso-0.8.6-pyhcf101f3_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/pathlib-1.0.1-py_1.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/noarch/pathspec-1.0.4-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pexpect-4.9.0-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pickleshare-0.7.5-pyhd8ed1ab_1004.conda
@@ -5445,25 +5443,6 @@ packages:
   license_family: MIT
   size: 82287
   timestamp: 1770676243987
-- conda: https://conda.anaconda.org/conda-forge/linux-64/pathlib-1.0.1-py310hff52083_7.tar.bz2
-  sha256: 133a357c3d7f4e401a7fec91cba7a29d923ca27f7db1411144d07795fca6af71
-  md5: 8136eda9039ea7d038f5f567b3d36edc
-  depends:
-  - python >=3.10,<3.11.0a0
-  - python_abi 3.10.* *_cp310
-  license: MIT
-  license_family: MIT
-  size: 4880
-  timestamp: 1666966452881
-- conda: https://conda.anaconda.org/conda-forge/noarch/pathlib-1.0.1-py_1.tar.bz2
-  sha256: ab8c9402ef7d8e8b23b66f27a5e9eafd63d3193c6531a62b4ae9b8a949f356e7
-  md5: 930df2b5ca63ffdd1dd5f8b235f344a2
-  depends:
-  - python
-  license: MIT
-  license_family: MIT
-  size: 14998
-  timestamp: 1531194126420
 - conda: https://conda.anaconda.org/conda-forge/noarch/pathspec-1.0.4-pyhd8ed1ab_0.conda
   sha256: 29ea20d0faf20374fcd61c25f6d32fb8e9a2c786a7f1473a0c3ead359470fbe1
   md5: 2908273ac396d2cd210a8127f5f1c0d6

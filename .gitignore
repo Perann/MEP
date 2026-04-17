@@ -11,3 +11,4 @@ env/
 data/
 notebooks/mlruns
 .env
+mlflow.db

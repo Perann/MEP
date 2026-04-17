@@ -1,7 +1,3 @@
-"""
-Training script for flight ticket price prediction with MLflow tracking.
-"""
-
 import os
 import json
 import tempfile
@@ -21,7 +17,6 @@ from sklearn.model_selection import train_test_split, RandomizedSearchCV
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import root_mean_squared_error, mean_absolute_error
 from mlflow.models import infer_signature
-
 import warnings
 
 warnings.filterwarnings("ignore", message=".*Inferred schema contains integer column.*")
@@ -41,6 +36,7 @@ def configure_tracking() -> str:
     Configure environment variables for S3 artifact storage and MLflow tracking.
     Returns the experiment_id.
     """
+
     load_dotenv()
 
     os.environ["AWS_ACCESS_KEY_ID"] = os.getenv("S3_ACCESS_KEY", "")
@@ -188,7 +184,6 @@ def train() -> None:
         experiment_id=experiment_id,
         run_name="gbr_randomized_search_prod",
     ):
-        # Active l'autologging sklearn pour récupérer params, métriques, child runs, etc.
         mlflow.sklearn.autolog(log_models=False)
 
         mlflow.set_tags(
@@ -203,7 +198,6 @@ def train() -> None:
         )
 
         search.fit(X_train, y_train)
-
         best_model = search.best_estimator_
         y_pred = best_model.predict(X_test)
 
