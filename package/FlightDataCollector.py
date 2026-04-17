@@ -78,6 +78,20 @@ class FlightDataCollector:
         duration = arr - dep
         return round(duration.total_seconds() / 3600, 2)
 
+    def calculate_days_left(self, dep_str):
+        """
+        Calculates the number of days between the current date and the flight departure.
+
+        Args:
+            dep_str (str): Scheduled departure time (ISO 8601).
+
+        Returns:
+            int: Number of days remaining.
+        """
+        dep_date = datetime.fromisoformat(dep_str.replace("Z", "+00:00")).date()
+        today = datetime.now().date()
+        return (dep_date - today).days
+
     def fetch_and_format(self, source_city, destination_city, ticket_class="Economy"):
         """
         Retrieves flight data from the API, filters by airline, and maps IATA codes back to city names.
@@ -116,20 +130,19 @@ class FlightDataCollector:
 
             selected_flight = None
             for f in flights:
-                api_airline = f["airline"]["name"].replace(" ", "_")
-                if api_airline in self.allowed_airlines:
+                raw_airline = f["airline"]["name"]
+                api_airline_clean = raw_airline.replace(" ", "_")
+
+                if api_airline_clean in self.allowed_airlines:
                     selected_flight = f
-                    selected_flight["airline_formatted"] = api_airline
+                    selected_flight["airline_display"] = raw_airline
                     break
 
             if not selected_flight:
-                return {
-                    "error": f"No flights found for allowed airlines: {self.allowed_airlines}"
-                }
+                return {"error": f"No flights found for allowed airlines."}
 
             return {
-                "airline": selected_flight["airline_formatted"],
-                "flight": selected_flight["flight"]["iata"],
+                "airline": selected_flight["airline_display"],
                 "source_city": self.iata_to_city.get(
                     selected_flight["departure"]["iata"], source_city
                 ),
@@ -148,6 +161,9 @@ class FlightDataCollector:
                     selected_flight["departure"]["scheduled"],
                     selected_flight["arrival"]["scheduled"],
                 ),
+                "days_left": self.calculate_days_left(
+                    selected_flight["departure"]["scheduled"]
+                ),
             }
 
         except Exception as e:
@@ -155,6 +171,7 @@ class FlightDataCollector:
 
 
 if __name__ == "__main__":
+
     from dotenv import load_dotenv
 
     load_dotenv()
