@@ -17,22 +17,55 @@ spec:
       containers:
       - name: api-container
         image: ghcr.io/perann/price-predictor-api:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
+        env:
+        - name: MLFLOW_TRACKING_URI
+          valueFrom:
+            secretKeyRef:
+              name: mlflow-s3-secrets
+              key: MLFLOW_TRACKING_URI
+        - name: MLFLOW_TRACKING_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mlflow-s3-secrets
+              key: MLFLOW_TRACKING_USERNAME
+        - name: MLFLOW_TRACKING_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mlflow-s3-secrets
+              key: MLFLOW_TRACKING_PASSWORD
+        - name: S3_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: mlflow-s3-secrets
+              key: S3_ACCESS_KEY
+        - name: S3_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: mlflow-s3-secrets
+              key: S3_SECRET_KEY
+        - name: S3_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: mlflow-s3-secrets
+              key: S3_ENDPOINT
+        
         resources:
           limits:
             cpu: "500m"
-            memory: "512Mi"
+            memory: "1Gi"
           requests:
-            cpu: "100m"
-            memory: "256Mi"
-        # Important pour le monitoring : vérifie si l'API est vivante
+            cpu: "200m"
+            memory: "512Mi"
+        
         livenessProbe:
           httpGet:
             path: /
             port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 10
+          initialDelaySeconds: 40
+          periodSeconds: 15
 
 ---
 
@@ -48,3 +81,24 @@ spec:
       port: 80
       targetPort: 8000
   type: ClusterIP
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: price-predictor-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: price-api-pnedjar.lab.sspcloud.fr
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: price-predictor-service
+            port:
+              number: 80
