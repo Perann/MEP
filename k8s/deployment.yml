@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: price-predictor-api
+  labels:
+    app: price-predictor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: price-predictor
+  template:
+    metadata:
+      labels:
+        app: price-predictor
+    spec:
+      containers:
+      - name: api-container
+        image: ghcr.io/perann/price-predictor-api:latest
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "256Mi"
+        # Important pour le monitoring : vérifie si l'API est vivante
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: price-predictor-service
+spec:
+  selector:
+    app: price-predictor
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: ClusterIP
