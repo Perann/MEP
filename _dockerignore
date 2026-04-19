@@ -1,0 +1,5 @@
+.pixi
+notebooks
+.git
+__pycache__
+.pytest_cache
