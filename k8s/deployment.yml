@@ -20,37 +20,20 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
+        # Ces valeurs seront remplacées par tes "External Variables" dans Argo CD
         env:
         - name: MLFLOW_TRACKING_URI
-          valueFrom:
-            secretKeyRef:
-              name: mlflow-s3-secrets
-              key: MLFLOW_TRACKING_URI
+          value: "https://mlflow.lab.sspcloud.fr"
         - name: MLFLOW_TRACKING_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: mlflow-s3-secrets
-              key: MLFLOW_TRACKING_USERNAME
+          value: "user-placeholder"
         - name: MLFLOW_TRACKING_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mlflow-s3-secrets
-              key: MLFLOW_TRACKING_PASSWORD
+          value: "pass-placeholder"
         - name: S3_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: mlflow-s3-secrets
-              key: S3_ACCESS_KEY
+          value: "key-placeholder"
         - name: S3_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: mlflow-s3-secrets
-              key: S3_SECRET_KEY
+          value: "secret-placeholder"
         - name: S3_ENDPOINT
-          valueFrom:
-            secretKeyRef:
-              name: mlflow-s3-secrets
-              key: S3_ENDPOINT
+          value: "https://minio.lab.sspcloud.fr"
         
         resources:
           limits:
@@ -64,7 +47,7 @@ spec:
           httpGet:
             path: /
             port: 8000
-          initialDelaySeconds: 40
+          initialDelaySeconds: 60 # On laisse du temps pour le téléchargement du modèle
           periodSeconds: 15
 
 ---
