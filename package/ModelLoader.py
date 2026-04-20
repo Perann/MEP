@@ -1,14 +1,25 @@
-import mlflow.pyfunc
 import os
-from dotenv import load_dotenv
 import logging
 
-logging.basicConfig(level=logging.INFO)
+from dotenv import load_dotenv
+import mlflow
+import mlflow.pyfunc
+
+
 logger = logging.getLogger(__name__)
+
+_model = None
 
 
 def load_model():
-    global model
+    """
+    Load the MLflow model only once and cache it.
+    """
+    global _model
+
+    if _model is not None:
+        return _model
+
     load_dotenv()
 
     required_vars = [
@@ -17,8 +28,10 @@ def load_model():
         "S3_ENDPOINT",
         "MLFLOW_TRACKING_URI",
     ]
-    if any(not os.getenv(var) for var in required_vars):
-        raise RuntimeError("Missing environment variables")
+
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+    if missing_vars:
+        raise RuntimeError(f"Missing environment variables: {', '.join(missing_vars)}")
 
     mlflow.set_tracking_uri(os.getenv("MLFLOW_TRACKING_URI"))
 
@@ -32,11 +45,11 @@ def load_model():
     if session_token:
         os.environ["AWS_SESSION_TOKEN"] = session_token
 
-    if model is None:
-        try:
-            model_uri = "models:/price_predictor/latest"
-            model = mlflow.pyfunc.load_model(model_uri)
-            logger.info("Model downloaded successfuly")
-        except Exception as e:
-            logger.error(f"Erreur : {e}")
-            raise e
+    try:
+        model_uri = "models:/price_predictor/latest"
+        _model = mlflow.pyfunc.load_model(model_uri)
+        logger.info("Model loaded successfully from MLflow")
+        return _model
+    except Exception as exc:
+        logger.exception("Failed to load model")
+        raise RuntimeError("Unable to load ML model") from exc
