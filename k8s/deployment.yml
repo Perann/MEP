@@ -18,6 +18,7 @@ spec:
       - name: api-container
         image: ghcr.io/perann/price-predictor-api:latest
         imagePullPolicy: Always
+        command: ["pixi", "run", "uvicorn", "package.price_predictor_api:app", "--host", "0.0.0.0", "--port", "8000"]
         ports:
         - containerPort: 8000
         env:
@@ -56,7 +57,6 @@ spec:
             secretKeyRef:
               name: mlflow-s3-secrets
               key: S3_SESSION_TOKEN
-        
         resources:
           limits:
             cpu: "500m"
@@ -64,7 +64,6 @@ spec:
           requests:
             cpu: "200m"
             memory: "512Mi"
-        
         livenessProbe:
           httpGet:
             path: /
