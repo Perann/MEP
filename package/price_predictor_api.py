@@ -97,7 +97,7 @@ def predict(data: dict):
         features = build_features(data)
         logger.info(f"Features used for prediction: {features}")
 
-        df = pd.DataFrame([data])
+        df = pd.DataFrame([features])
         prediction = model.predict(df)[0]
         logger.info(f"Prediction: {prediction}")
         return {"price": float(prediction)}
