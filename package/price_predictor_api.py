@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 import pandas as pd
 import logging
 import os
+from dotenv import load_dotenv
 
 from ModelLoader import load_model
 
@@ -59,6 +60,7 @@ def build_features(data: dict) -> dict:
             ),
         )
 
+    load_dotenv()
     api_key = os.getenv("AVIATION_STACK_API_KEY")
     if not api_key:
         raise HTTPException(
@@ -99,6 +101,8 @@ def predict(data: dict):
         prediction = model.predict(df)[0]
         logger.info(f"Prediction: {prediction}")
         return {"price": float(prediction)}
+    except HTTPException:
+        raise
     except Exception as exc:
         logger.error(f"Prediction failed: {exc}")
         raise HTTPException(status_code=400, detail="Invalid input for prediction")
@@ -117,3 +121,10 @@ if __name__ == "__main__":
         "days_left": 1,
     }
     predict(ex_data)
+
+    minimal_data = {
+        "source_city": "Delhi",
+        "destination_city": "Mumbai",
+        "class": "Economy",
+    }
+    predict(minimal_data)
