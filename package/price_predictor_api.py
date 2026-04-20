@@ -17,6 +17,11 @@ model = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    Lifespan function to handle startup and shutdown events.
+    On startup, it loads the ML model and makes it available globally.
+    On shutdown, it performs any necessary cleanup.
+    """
     # -- startup --
     global model
     try:
@@ -93,7 +98,11 @@ def home():
 
 @app.post("/predict")
 def predict(data: dict):
-    if model is None:  # ← on utilise le global, sans recharger
+    """
+    Predict flight price based on input data.
+    Accepts either full feature set or minimal input (source_city, destination_city, class).
+    """
+    if model is None:
         raise HTTPException(status_code=503, detail="Model not available")
 
     logger.info(f"Received request: {data}")
@@ -111,6 +120,9 @@ def predict(data: dict):
 
 
 def _is_full_input(data: dict) -> bool:
+    """
+    Check if the input data contains all required features for direct prediction.
+    """
     required_fields = [
         "airline",
         "source_city",
