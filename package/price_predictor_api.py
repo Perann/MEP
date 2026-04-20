@@ -2,11 +2,10 @@ from fastapi import FastAPI, HTTPException
 import pandas as pd
 import logging
 import os
-from dotenv import load_dotenv
 from contextlib import asynccontextmanager
+from fastapi import Header
 
 from .ModelLoader import load_model
-
 from .FlightDataCollector import FlightDataCollector
 
 logging.basicConfig(level=logging.INFO)
@@ -22,7 +21,6 @@ async def lifespan(app: FastAPI):
     On startup, it loads the ML model and makes it available globally.
     On shutdown, it performs any necessary cleanup.
     """
-    # -- startup --
     global model
     try:
         model = load_model()
@@ -32,15 +30,13 @@ async def lifespan(app: FastAPI):
         raise RuntimeError(f"Cannot start API without model: {e}")
 
     yield
-
-    # -- shutdown (optionnel) --
     logger.info("Shutting down API")
 
 
 app = FastAPI(title="Flight Price API", lifespan=lifespan)
 
 
-def build_features(data: dict) -> dict:
+def build_features(data: dict, api_key: str | None) -> dict:
     """
     Build the final feature payload for the model.
     If input is partial, enrich it using AviationStack.
@@ -70,12 +66,10 @@ def build_features(data: dict) -> dict:
             ),
         )
 
-    load_dotenv()
-    api_key = os.getenv("AVIATION_STACK_API_KEY")
     if not api_key:
         raise HTTPException(
-            status_code=500,
-            detail="AVIATION_STACK_API_KEY is missing from environment variables",
+            status_code=400,
+            detail="Missing Aviationstack API key. Provide it in 'x-aviation-key' header.",
         )
 
     collector = FlightDataCollector(api_key)
@@ -97,7 +91,7 @@ def home():
 
 
 @app.post("/predict")
-def predict(data: dict):
+def predict(data: dict, x_aviation_key: str | None = Header(default=None)):
     """
     Predict flight price based on input data.
     Accepts either full feature set or minimal input (source_city, destination_city, class).
@@ -107,11 +101,10 @@ def predict(data: dict):
 
     logger.info(f"Received request: {data}")
     try:
-        features = build_features(data)
-        logger.info(f"Features: {features}")
+        features = build_features(data, x_aviation_key)
         prediction = model.predict(pd.DataFrame([features]))[0]
-        logger.info(f"Prediction: {prediction}")
         return {"price": float(prediction)}
+
     except HTTPException:
         raise
     except Exception as exc:
@@ -139,6 +132,8 @@ def _is_full_input(data: dict) -> bool:
 
 if __name__ == "__main__":
     model = load_model()
+    test_api_key = os.getenv("AVIATION_STACK_API_KEY")
+
     ex_data = {
         "airline": "SpiceJet",
         "source_city": "Delhi",
@@ -150,11 +145,23 @@ if __name__ == "__main__":
         "duration": 2.17,
         "days_left": 1,
     }
-    predict(ex_data)
+
+    features_full = build_features(ex_data, api_key=None)
+    pred_full = model.predict(pd.DataFrame([features_full]))[0]
+
+    print("FULL INPUT PREDICTION:", float(pred_full))
 
     minimal_data = {
         "source_city": "Delhi",
         "destination_city": "Mumbai",
         "class": "Economy",
     }
-    predict(minimal_data)
+
+    try:
+        features_min = build_features(minimal_data, api_key=test_api_key)
+        pred_min = model.predict(pd.DataFrame([features_min]))[0]
+
+        print("MINIMAL INPUT PREDICTION:", float(pred_min))
+
+    except Exception as e:
+        print("MINIMAL INPUT FAILED:", e)
