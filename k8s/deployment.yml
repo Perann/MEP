@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: price-predictor-api
+  name: price-predictor-deployment
   labels:
     app: price-predictor
 spec:
@@ -15,7 +15,7 @@ spec:
         app: price-predictor
     spec:
       containers:
-      - name: api-container
+      - name: price-predictor
         image: ghcr.io/perann/price-predictor-api:latest
         imagePullPolicy: Always
         command: ["pixi", "run", "uvicorn", "package.price_predictor_api:app", "--host", "0.0.0.0", "--port", "8000"]
