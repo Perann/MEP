@@ -3,14 +3,16 @@ kind: Ingress
 metadata:
   name: price-predictor-ingress
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Authorization, Content-Type"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
 spec:
   ingressClassName: nginx
   tls:
   - hosts:
     - price-api-pnedjar.lab.sspcloud.fr
-    secretName: price-api-tls
   rules:
   - host: price-api-pnedjar.lab.sspcloud.fr
     http:
