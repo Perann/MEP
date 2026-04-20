@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: price-predictor-api
+  name: flight-price-api
   labels:
-    app: price-predictor
+    app: flight-price-api
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: price-predictor
+      app: flight-price-api
   template:
     metadata:
       labels:
-        app: price-predictor
+        app: flight-price-api
     spec:
       containers:
       - name: api-container
@@ -20,68 +20,79 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
-        # Ces valeurs seront remplacées par tes "External Variables" dans Argo CD
         env:
-        - name: MLFLOW_TRACKING_URI
-          value: "https://mlflow.lab.sspcloud.fr"
-        - name: MLFLOW_TRACKING_USERNAME
-          value: "user-placeholder"
-        - name: MLFLOW_TRACKING_PASSWORD
-          value: "pass-placeholder"
+        # Correspondance entre ton code Python et ton secret Kubernetes
         - name: S3_ACCESS_KEY
-          value: "key-placeholder"
+          valueFrom:
+            secretKeyRef:
+              name: mlflow_s3_secrets
+              key: S3_ACCESS_KEY
         - name: S3_SECRET_KEY
-          value: "secret-placeholder"
+          valueFrom:
+            secretKeyRef:
+              name: mlflow_s3_secrets
+              key: S3_SECRET_KEY
+        - name: S3_SESSION_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: mlflow_s3_secrets
+              key: S3_SESSION_TOKEN
         - name: S3_ENDPOINT
-          value: "https://minio.lab.sspcloud.fr"
-        
+          valueFrom:
+            secretKeyRef:
+              name: mlflow_s3_secrets
+              key: S3_ENDPOINT
+        - name: MLFLOW_TRACKING_URI
+          valueFrom:
+            secretKeyRef:
+              name: mlflow_s3_secrets
+              key: MLFLOW_TRACKING_URI
+        - name: MLFLOW_TRACKING_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mlflow_s3_secrets
+              key: MLFLOW_TRACKING_USERNAME
+        - name: MLFLOW_TRACKING_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mlflow_s3_secrets
+              key: MLFLOW_TRACKING_PASSWORD
         resources:
           limits:
-            cpu: "500m"
-            memory: "1Gi"
+            cpu: "1"
+            memory: "2Gi"
           requests:
-            cpu: "200m"
-            memory: "512Mi"
-        
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8000
-          initialDelaySeconds: 60 # On laisse du temps pour le téléchargement du modèle
-          periodSeconds: 15
-
+            cpu: "0.5"
+            memory: "1Gi"
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
-  name: price-predictor-service
+  name: flight-price-api-service
 spec:
   selector:
-    app: price-predictor
+    app: flight-price-api
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8000
   type: ClusterIP
-
 ---
-
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: price-predictor-ingress
+  name: flight-price-api-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
 spec:
   rules:
-  - host: price-api-pnedjar.lab.sspcloud.fr
+  - host: flight-price-api.lab.sspcloud.fr  
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: price-predictor-service
+            name: flight-price-api-service
             port:
               number: 80
