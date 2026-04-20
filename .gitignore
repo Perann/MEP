@@ -12,3 +12,4 @@ data/
 notebooks/mlruns
 .env
 mlflow.db
+.vscode/
