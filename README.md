@@ -46,6 +46,8 @@ You can provide either a full feature set or a minimal input.
   "duration": 2.17,
   "days_left": 1
 }
+
+
 ✔️ Minimal input example
 {
   "source_city": "Delhi",
@@ -54,6 +56,7 @@ You can provide either a full feature set or a minimal input.
 }
 
 In this case, the API automatically enriches the data using external flight information (requires an AviationStack API key).
+Pay attention that for now, only major indian cities are tolerated as source or destination cities : Delhi, Mumbai, Bangalore, Kolkata, Hyderabad,Chennai
 
 🔐 Header (required for minimal input)
 x-aviation-key: YOUR_API_KEY
@@ -87,16 +90,24 @@ This project uses Pixi
 
 Install Pixi CLI:
 
-curl -fsSL https://pixi.sh/install.sh | bash
+``
+curl -fsSL https://pixi.sh/install.sh
+```
+
 2. Environment setup
+
+```
 git clone <your-repo-url>
 cd <your-project-name>
 pixi install
+```
 3. Run the project
 
 You can run commands inside the managed environment:
 
+```
 pixi run python src/train.py
+```
 4. Code quality (pre-commit)
 
 We use Black for formatting.
