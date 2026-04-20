@@ -5,9 +5,9 @@ import os
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
 
-from ModelLoader import load_model
+from .ModelLoader import load_model
 
-from FlightDataCollector import FlightDataCollector
+from .FlightDataCollector import FlightDataCollector
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -126,6 +126,7 @@ def _is_full_input(data: dict) -> bool:
 
 
 if __name__ == "__main__":
+    model = load_model()
     ex_data = {
         "airline": "SpiceJet",
         "source_city": "Delhi",
