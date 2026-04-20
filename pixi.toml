@@ -2,7 +2,7 @@
 authors = ["perann", "adam", "emile"]
 channels = ["conda-forge"]
 name = "MEP"
-platforms = ["linux-64", "osx-arm64",]
+platforms = ["linux-64", "osx-arm64", "linux-aarch64",]
 version = "0.1.0"
 
 [dependencies]
