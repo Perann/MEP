@@ -3,31 +3,36 @@ import pandas as pd
 import logging
 import os
 from dotenv import load_dotenv
+from contextlib import asynccontextmanager
 
-from .ModelLoader import load_model
+from ModelLoader import load_model
 
-from .FlightDataCollector import FlightDataCollector
+from FlightDataCollector import FlightDataCollector
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Flight Price API")
 model = None
 
 
-def _is_full_input(data: dict) -> bool:
-    required_fields = [
-        "airline",
-        "source_city",
-        "departure_time",
-        "stops",
-        "arrival_time",
-        "destination_city",
-        "class",
-        "duration",
-        "days_left",
-    ]
-    return all(data.get(field) is not None for field in required_fields)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # -- startup --
+    global model
+    try:
+        model = load_model()
+        logger.info("Model loaded successfully")
+    except Exception as e:
+        logger.error(f"Model loading failed: {e}")
+        raise RuntimeError(f"Cannot start API without model: {e}")
+
+    yield
+
+    # -- shutdown (optionnel) --
+    logger.info("Shutting down API")
+
+
+app = FastAPI(title="Flight Price API", lifespan=lifespan)
 
 
 def build_features(data: dict) -> dict:
@@ -81,17 +86,6 @@ def build_features(data: dict) -> dict:
     return enriched_data
 
 
-@app.on_event("startup")
-def startup_event():
-    global model
-    try:
-        model = load_model()
-        logger.info("Model loaded successfully")
-    except Exception as e:
-        logger.error(f"Model loading failed: {e}")
-        model = None
-
-
 @app.get("/")
 def home():
     return {"status": "API running", "model_ready": model is not None}
@@ -114,6 +108,21 @@ def predict(data: dict):
     except Exception as exc:
         logger.error(f"Prediction failed: {exc}")
         raise HTTPException(status_code=400, detail="Invalid input for prediction")
+
+
+def _is_full_input(data: dict) -> bool:
+    required_fields = [
+        "airline",
+        "source_city",
+        "departure_time",
+        "stops",
+        "arrival_time",
+        "destination_city",
+        "class",
+        "duration",
+        "days_left",
+    ]
+    return all(data.get(field) is not None for field in required_fields)
 
 
 if __name__ == "__main__":
