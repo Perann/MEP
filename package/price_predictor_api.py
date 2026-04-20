@@ -4,9 +4,9 @@ import logging
 import os
 from dotenv import load_dotenv
 
-from ModelLoader import load_model
+from .ModelLoader import load_model
 
-from FlightDataCollector import FlightDataCollector
+from .FlightDataCollector import FlightDataCollector
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
