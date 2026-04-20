@@ -114,4 +114,6 @@ We use Black for formatting.
 
 Install pre-commit hooks:
 
-pixi run pre-commit install
+```
+pixi run pre-commit install̀
+```
