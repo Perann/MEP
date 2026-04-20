@@ -15,7 +15,7 @@ app = FastAPI(title="Flight Price API")
 model = None
 
 
-def is_full_input(data: dict) -> bool:
+def _is_full_input(data: dict) -> bool:
     required_fields = [
         "airline",
         "source_city",
@@ -35,7 +35,7 @@ def build_features(data: dict) -> dict:
     Build the final feature payload for the model.
     If input is partial, enrich it using AviationStack.
     """
-    if is_full_input(data):
+    if _is_full_input(data):
         return {
             "airline": data["airline"],
             "source_city": data["source_city"],
@@ -81,6 +81,17 @@ def build_features(data: dict) -> dict:
     return enriched_data
 
 
+@app.on_event("startup")
+def startup_event():
+    global model
+    try:
+        model = load_model()
+        logger.info("Model loaded successfully")
+    except Exception as e:
+        logger.error(f"Model loading failed: {e}")
+        model = None
+
+
 @app.get("/")
 def home():
     return {"status": "API running", "model_ready": model is not None}
@@ -88,17 +99,14 @@ def home():
 
 @app.post("/predict")
 def predict(data: dict):
-    model = load_model()
-    if model is None:
-        raise HTTPException(status_code=500, detail="Model not loaded")
+    if model is None:  # ← on utilise le global, sans recharger
+        raise HTTPException(status_code=503, detail="Model not available")
 
     logger.info(f"Received request: {data}")
     try:
         features = build_features(data)
-        logger.info(f"Features used for prediction: {features}")
-
-        df = pd.DataFrame([features])
-        prediction = model.predict(df)[0]
+        logger.info(f"Features: {features}")
+        prediction = model.predict(pd.DataFrame([features]))[0]
         logger.info(f"Prediction: {prediction}")
         return {"price": float(prediction)}
     except HTTPException:
