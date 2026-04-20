@@ -12,10 +12,9 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - price-api-pnedjar.lab.sspcloud.fr
-    secretName: price-api-tls  # <--- AJOUTE ÇA, c'est crucial pour Argo
+    - price-predictor-pnedjar.lab.sspcloud.fr
   rules:
-  - host: price-api-pnedjar.lab.sspcloud.fr
+  - host: price-predictor-pnedjar.lab.sspcloud.fr
     http:
       paths:
       - path: /
