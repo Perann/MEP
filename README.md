@@ -90,7 +90,7 @@ This project uses Pixi
 
 Install Pixi CLI:
 
-``
+```
 curl -fsSL https://pixi.sh/install.sh
 ```
 
